@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/DetailScreen/DetailScreen.dart';
 
 class FeaturedTemplate extends StatefulWidget {
   const FeaturedTemplate({Key? key}) : super(key: key);
@@ -51,7 +52,16 @@ class _FeaturedTemplateState extends State<FeaturedTemplate> {
         return GestureDetector(
           onTap: () {
             print('${title[index]}');
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(title: title[index])));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailScreen(
+                          title: title[index],
+                          image: image[index],
+                          address: address[index],
+                          price: price[index],
+                          rating: rating[index],
+                        )));
           },
           child: Stack(
             children: [

@@ -15,8 +15,21 @@ class _Grid_templeteState extends State<Grid_templete> {
     "h4.jpeg",
     "h5.jpeg",
     "h6.jpeg",
+    "h7.jpeg",
+    "h8.jpeg",
+    "h9.jpeg",
   ];
-  List<String> rating = ["4.8", "4.3", "4.0", "4.6", "4.9", "5.0"];
+  List<String> rating = [
+    "4.8",
+    "4.3",
+    "4.0",
+    "4.6",
+    "4.9",
+    "5.0",
+    "3.7",
+    "3.9",
+    "3.5"
+  ];
   List<String> title = [
     "Zostel Patna",
     "Lichchavi Vihar Hostel",
@@ -24,6 +37,9 @@ class _Grid_templeteState extends State<Grid_templete> {
     "Hotel City Home",
     "Rama Girls Hostel",
     "Taj Boys Hostel",
+    "Ratna Girls Hostel",
+    "Sudha Girls Hostel",
+    "Jaya Girls Hostel",
   ];
   List<String> address = [
     "Rajendra Nagar, Patna",
@@ -32,6 +48,9 @@ class _Grid_templeteState extends State<Grid_templete> {
     "Bailey Road , Patna",
     "Anisabad , patna",
     "Boring Road , Patna",
+    "Gandhi maidan , Patna",
+    "Phulwari Sharif , Patna",
+    "Phulwari Sharif , Patna",
   ];
   List<String> price = [
     "₹ 3000/ mo",
@@ -40,12 +59,15 @@ class _Grid_templeteState extends State<Grid_templete> {
     "₹ 4000/ mo",
     "₹ 4700/ mo",
     "₹ 9000/ mo",
+    "₹ 5900/ mo",
+    "₹ 900/ mo",
+    "₹ 6900/ mo",
   ];
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
         scrollDirection: Axis.horizontal,
-        physics: PageScrollPhysics(),
+        physics: ScrollPhysics(parent: RangeMaintainingScrollPhysics()),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10,
