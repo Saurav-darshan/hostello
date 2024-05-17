@@ -14,6 +14,14 @@ class Profile_Screen extends StatefulWidget {
 }
 
 class _Profile_ScreenState extends State<Profile_Screen> {
+  String user = "User";
+  String image_uri = "";
+  @override
+  void initState() {
+    Username();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,7 +45,8 @@ class _Profile_ScreenState extends State<Profile_Screen> {
               Align(
                   alignment: Alignment(0, -.7),
                   child: CircleAvatar(
-                    foregroundImage: AssetImage("assets/pp.jpg"),
+                    foregroundImage: NetworkImage(
+                        "https://imindsbucket.s3.ap-south-1.amazonaws.com/${image_uri}"),
                     radius: MediaQuery.sizeOf(context).width / 7,
                   )),
               Align(
@@ -63,7 +72,7 @@ class _Profile_ScreenState extends State<Profile_Screen> {
                     child: Column(
                       children: [
                         Text(
-                          "Saurav Darshan",
+                          user,
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 22,
@@ -318,5 +327,16 @@ class _Profile_ScreenState extends State<Profile_Screen> {
         ),
       ),
     );
+  }
+
+  Future Username() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    var name = sp.getString('person_name');
+    var uri = sp.getString('image_uri');
+
+    setState(() {
+      user = name!;
+      image_uri = uri!;
+    });
   }
 }

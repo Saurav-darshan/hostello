@@ -79,7 +79,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             backgroundColor: Color.fromARGB(255, 0, 149, 255),
                           ),
                           child: const Text(
-                            "Booking Now",
+                            "Enquiry Now",
                             style: TextStyle(
                                 color: Color.fromARGB(255, 243, 243, 243),
                                 fontSize: 20),
@@ -431,6 +431,8 @@ class _Amminites_IconState extends State<Amminites_Icon> {
   }
 }
 
+//--------------------> facillites icon grid templete <-----------------\\
+
 class _facilities_icon extends StatefulWidget {
   const _facilities_icon({super.key});
 
@@ -464,6 +466,8 @@ class __facilities_iconState extends State<_facilities_icon> {
   }
 }
 
+//---------> Gallery Templete <-------------\\
+
 class Gallery_templete extends StatefulWidget {
   const Gallery_templete({super.key, required this.images});
   final String images;
@@ -483,6 +487,8 @@ class _Gallery_templeteState extends State<Gallery_templete> {
     );
   }
 }
+
+//-------> Gallery Enlarge display tempelete <-------------\\
 
 class GalleryBottomSheet_Templete extends StatefulWidget {
   const GalleryBottomSheet_Templete({super.key, required this.image});
