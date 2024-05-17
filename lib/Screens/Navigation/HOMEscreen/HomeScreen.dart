@@ -4,6 +4,8 @@ import 'package:hostello/Screens/Navigation/HOMEscreen/OurRecommendation.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Featured_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Grid_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/menu_templete.dart';
+import 'package:hostello/Screens/Navigation/Profile/Profile_Screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +15,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String user = "User";
+  String image_uri = "";
+  @override
+  void initState() {
+    Username();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,9 +32,19 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Color.fromARGB(255, 255, 255, 255),
           leading: Padding(
             padding: EdgeInsets.only(left: 10),
-            child: CircleAvatar(
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-              foregroundImage: AssetImage("assets/pp.jpg"),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profile_Screen(),
+                    ));
+              },
+              child: CircleAvatar(
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                foregroundImage: NetworkImage(
+                    "https://imindsbucket.s3.ap-south-1.amazonaws.com/${image_uri}"),
+              ),
             ),
           ),
           actions: [
@@ -55,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w500),
               ),
               Text(
-                "Saurav Darshan",
+                user,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
@@ -65,102 +85,147 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           centerTitle: false,
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            child: Column(children: [
-              Container(
-                margin:
-                    EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
-                padding:
-                    EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color.fromARGB(40, 158, 158, 158),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [Icon(Icons.search), Text('Search')],
-                    ),
-                    InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                              isScrollControlled: false,
-                              context: context,
-                              builder: (Buildercontext) {
-                                return FilterPannel();
-                              });
-                        },
-                        child: Icon(Icons.format_list_bulleted_sharp))
-                  ],
-                ),
+        body: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
+              padding:
+                  EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Color.fromARGB(40, 158, 158, 158),
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Featured",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2.2,
-                child: FeaturedTemplate(),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Our Recommendation",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OurRecommendation(),
-                            ));
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [Icon(Icons.search), Text('Search')],
+                  ),
+                  InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            isScrollControlled: false,
+                            context: context,
+                            builder: (Buildercontext) {
+                              return FilterPannel();
+                            });
                       },
-                      child: Text(
-                        "See All",
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ),
+                      child: Icon(Icons.format_list_bulleted_sharp))
+                ],
               ),
-              SizedBox(height: 50, child: Menu_templete()),
-              SizedBox(height: 650, child: Grid_templete()),
-            ]),
-          ),
+            ),
+            Container(
+              height: MediaQuery.sizeOf(context).height / 1.5,
+              child: SingleChildScrollView(
+                child: Column(children: [
+                  // Container(
+                  //   margin: EdgeInsets.only(
+                  //       left: 10, right: 10, top: 20, bottom: 20),
+                  //   padding: EdgeInsets.only(
+                  //       left: 10, right: 10, top: 10, bottom: 10),
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(10),
+                  //     color: Color.fromARGB(40, 158, 158, 158),
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Row(
+                  //         children: [Icon(Icons.search), Text('Search')],
+                  //       ),
+                  //       InkWell(
+                  //           onTap: () {
+                  //             showModalBottomSheet(
+                  //                 isScrollControlled: false,
+                  //                 context: context,
+                  //                 builder: (Buildercontext) {
+                  //                   return FilterPannel();
+                  //                 });
+                  //           },
+                  //           child: Icon(Icons.format_list_bulleted_sharp))
+                  //     ],
+                  //   ),
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Featured",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "See All",
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 2.2,
+                    child: FeaturedTemplate(),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Our Recommendation",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OurRecommendation(),
+                                ));
+                          },
+                          child: Text(
+                            "See All",
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 50, child: Menu_templete()),
+                  SizedBox(height: 650, child: Grid_templete()),
+                ]),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+  //-------------->   getting User name<-----------------\\
+
+  Future Username() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    var name = sp.getString('person_name');
+    var uri = sp.getString('image_uri');
+
+    setState(() {
+      user = name!;
+      image_uri = uri!;
+    });
   }
 }
 

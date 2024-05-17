@@ -2,9 +2,9 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/Navigation/Fav_Screen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/HomeScreen.dart';
-import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Grid_templete.dart';
 import 'package:hostello/Screens/Navigation/Message_Screen.dart';
 import 'package:hostello/Screens/Navigation/Profile/Profile_Screen.dart';
+import 'package:hostello/Screens/Navigation/Search_Screen.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -18,8 +18,8 @@ class _LandingPageState extends State<LandingPage> {
   List<Widget> Widgetlist = [
     Fav_Screen(),
     //Notification_templete(),
-    Grid_templete(),
-    //Search_Screen(),
+    //Grid_templete(),
+    Search_Screen(),
     HomeScreen(),
     Message_Screen(),
     Profile_Screen()

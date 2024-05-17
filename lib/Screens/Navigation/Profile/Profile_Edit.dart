@@ -10,43 +10,48 @@ class Profile_Edit extends StatefulWidget {
 class _Profile_EditState extends State<Profile_Edit> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            Stack(children: [
-              Align(
-                  alignment: Alignment(0, -.7),
-                  child: CircleAvatar(
-                    foregroundImage: AssetImage("assets/pp.jpg"),
-                    radius: 60,
-                  )),
-              Positioned(
-                top: 88,
-                left: 235,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        surfaceTintColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          Stack(children: [
+            Align(
+                alignment: Alignment(0, -.7),
+                child: CircleAvatar(
+                  foregroundImage: AssetImage("assets/pp.jpg"),
+                  radius: 60,
+                )),
+            Positioned(
+              top: 88,
+              left: 235,
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
                 ),
               ),
-            ]),
-            const SizedBox(height: 30),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: MediaQuery.of(context).size.height / 1.5,
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.only(left: 20, right: 20),
-                //color: Color.fromARGB(255, 222, 249, 255),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: MediaQuery.of(context).size.height / 1.5,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(left: 20, right: 20, top: 10),
+              //color: Color.fromARGB(255, 222, 249, 255),
+              child: SingleChildScrollView(
                 child: Column(children: [
+                  SizedBox(
+                    height: 10,
+                  ),
                   TextFormField(
                     decoration: InputDecoration(
                         filled: true,
@@ -183,8 +188,8 @@ class _Profile_EditState extends State<Profile_Edit> {
                 ]),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

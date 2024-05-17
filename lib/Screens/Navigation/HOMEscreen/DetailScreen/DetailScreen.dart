@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/DetailScreen/BookingScreen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Featured_templete.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -62,7 +63,13 @@ class _DetailScreenState extends State<DetailScreen> {
                           ],
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookingScreen(),
+                                ));
+                          },
                           style: ElevatedButton.styleFrom(
                             surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
                             shape: StadiumBorder(),
@@ -323,6 +330,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   TextButton(
                                     onPressed: () {
                                       showModalBottomSheet(
+                                          backgroundColor: Colors.transparent,
                                           context: context,
                                           builder: (Buildercontext) {
                                             return SizedBox(
@@ -330,15 +338,15 @@ class _DetailScreenState extends State<DetailScreen> {
                                                   .height,
                                               child: ListView.builder(
                                                 itemCount: 5,
-                                                padding: EdgeInsets.all(20),
                                                 physics: PageScrollPhysics(),
-                                                reverse: true,
                                                 scrollDirection:
                                                     Axis.horizontal,
                                                 itemBuilder:
                                                     (BuildContext context,
                                                         int index) {
-                                                  return GalleryBottomSheet_Templete();
+                                                  return GalleryBottomSheet_Templete(
+                                                    image: widget.image,
+                                                  );
                                                 },
                                               ),
                                             );
@@ -355,14 +363,24 @@ class _DetailScreenState extends State<DetailScreen> {
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Gallery_templete(),
-                                Gallery_templete(),
-                                Gallery_templete()
-                              ],
-                            )
+                            SizedBox(
+                              width: MediaQuery.sizeOf(context).width,
+                              height: 120,
+                              child: ListView.builder(
+                                padding: EdgeInsets.only(right: 10),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 6,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 10, right: 10),
+                                    child: Gallery_templete(
+                                      images: widget.image,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       )),
@@ -447,7 +465,8 @@ class __facilities_iconState extends State<_facilities_icon> {
 }
 
 class Gallery_templete extends StatefulWidget {
-  const Gallery_templete({super.key});
+  const Gallery_templete({super.key, required this.images});
+  final String images;
 
   @override
   State<Gallery_templete> createState() => _Gallery_templeteState();
@@ -457,10 +476,8 @@ class _Gallery_templeteState extends State<Gallery_templete> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120,
-      height: 120,
       child: ClipRRect(
-        child: Image.asset("assets/h1.jpeg", fit: BoxFit.cover),
+        child: Image.asset("assets/${widget.images}", fit: BoxFit.cover),
         borderRadius: BorderRadius.circular(20),
       ),
     );
@@ -468,7 +485,8 @@ class _Gallery_templeteState extends State<Gallery_templete> {
 }
 
 class GalleryBottomSheet_Templete extends StatefulWidget {
-  const GalleryBottomSheet_Templete({super.key});
+  const GalleryBottomSheet_Templete({super.key, required this.image});
+  final String image;
 
   @override
   State<GalleryBottomSheet_Templete> createState() =>
@@ -480,14 +498,13 @@ class _GalleryBottomSheet_TempleteState
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: MediaQuery.sizeOf(context).width - 10,
       margin: EdgeInsets.all(10),
-      width: MediaQuery.sizeOf(context).width,
-      height: MediaQuery.sizeOf(context).width,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Image.asset(
-          "assets/h2.jpeg",
-          fit: BoxFit.contain,
+          "assets/${widget.image}",
+          fit: BoxFit.fill,
         ),
       ),
     );

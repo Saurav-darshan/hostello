@@ -171,16 +171,19 @@ class _SignupScreenState extends State<SignupScreen> {
                                     },
                                   ),
                                   Text('Female'),
-                                  Radio(
-                                    value: 'Others',
-                                    groupValue: _gender,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _gender = value!;
-                                      });
-                                    },
-                                  ),
-                                  Text('Others'),
+                                  // Radio(
+
+                                  //   value: 'Others',
+                                  //   groupValue: _gender,
+                                  //   onChanged: (value) {
+                                  //     setState(() {
+                                  //       _gender = value!;
+                                  //     });
+                                  //   },
+                                  // ),
+                                  // Text(
+                                  //   'Others',
+                                  // ),
                                 ],
                               ),
                               SizedBox(height: 20),

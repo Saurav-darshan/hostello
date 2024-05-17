@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/DetailScreen/DetailScreen.dart';
 
 class Grid_templete extends StatefulWidget {
   const Grid_templete({super.key});
@@ -61,7 +62,7 @@ class _Grid_templeteState extends State<Grid_templete> {
     "₹ 9000/ mo",
     "₹ 5900/ mo",
     "₹ 900/ mo",
-    "₹ 6900/ mo",
+    "₹ 6000/ mo",
   ];
   @override
   Widget build(BuildContext context) {
@@ -75,97 +76,113 @@ class _Grid_templeteState extends State<Grid_templete> {
             childAspectRatio: 1.5),
         itemCount: image.length,
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 250,
-            width: 200,
-            child: Card(
-              color: Colors.white,
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Container(
-                padding: EdgeInsets.only(top: 15, left: 15, right: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 2.2,
-                          height: MediaQuery.of(context).size.width / 2.2,
-                          margin: EdgeInsets.only(bottom: 10),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(30),
-                            child: Image.asset(
-                              "assets/${image[index]}",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 20,
-                          right: 20,
-                          child: Container(
-                            width: 50,
-                            height: 20,
-                            margin: EdgeInsets.only(bottom: 5),
-                            decoration: BoxDecoration(
+          return GestureDetector(
+            onTap: () {
+              print('${title[index]}');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailScreen(
+                            title: title[index],
+                            image: image[index],
+                            address: address[index],
+                            price: price[index],
+                            rating: rating[index],
+                          )));
+            },
+            child: Container(
+              height: 250,
+              width: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Container(
+                  padding: EdgeInsets.only(top: 15, left: 15, right: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width / 2.2,
+                            height: MediaQuery.of(context).size.width / 2.2,
+                            margin: EdgeInsets.only(bottom: 10),
+                            child: ClipRRect(
                               borderRadius: BorderRadius.circular(30),
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                  size: 15,
-                                ),
-                                Text(
-                                  rating[index],
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.blue[800],
-                                      fontSize: 13),
-                                )
-                              ],
+                              child: Image.asset(
+                                "assets/${image[index]}",
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      title[index],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      address[index],
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 10,
+                          Positioned(
+                            top: 20,
+                            right: 20,
+                            child: Container(
+                              width: 50,
+                              height: 20,
+                              margin: EdgeInsets.only(bottom: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                    size: 15,
+                                  ),
+                                  Text(
+                                    rating[index],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.blue[800],
+                                        fontSize: 13),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          price[index],
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800),
+                      Text(
+                        title[index],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        address[index],
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 10,
                         ),
-                        Fav_check()
-                      ],
-                    ),
-                  ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            price[index],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800),
+                          ),
+                          Fav_check()
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
