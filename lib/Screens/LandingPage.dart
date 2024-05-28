@@ -1,6 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:hostello/Screens/Navigation/Fav_Screen.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/FavScreen/Fav_Screen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/HomeScreen.dart';
 import 'package:hostello/Screens/Navigation/Message_Screen.dart';
 import 'package:hostello/Screens/Navigation/Profile/Profile_Screen.dart';

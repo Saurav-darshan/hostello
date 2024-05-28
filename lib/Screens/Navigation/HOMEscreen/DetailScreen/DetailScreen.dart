@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hostello/Screens/Navigation/HOMEscreen/DetailScreen/BookingScreen.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/DetailScreen/Enquiry_Screen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Featured_templete.dart';
 
 class DetailScreen extends StatefulWidget {

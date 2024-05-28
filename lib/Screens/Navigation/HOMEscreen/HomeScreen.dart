@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/NotificationScreen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/OurRecommendation.dart';
+import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/AdBanner_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Featured_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Grid_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/menu_templete.dart';
@@ -87,33 +88,34 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Column(
           children: [
-            Container(
-              margin: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
-              padding:
-                  EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color.fromARGB(40, 158, 158, 158),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [Icon(Icons.search), Text('Search')],
-                  ),
-                  InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            isScrollControlled: false,
-                            context: context,
-                            builder: (Buildercontext) {
-                              return FilterPannel();
-                            });
-                      },
-                      child: Icon(Icons.format_list_bulleted_sharp))
-                ],
-              ),
-            ),
+            SearchBar(),
+            // Container(
+            //   margin: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
+            //   padding:
+            //       EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(10),
+            //     color: Color.fromARGB(40, 158, 158, 158),
+            //   ),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Row(
+            //         children: [Icon(Icons.search), Text('Search')],
+            //       ),
+            //       InkWell(
+            //           onTap: () {
+            //             showModalBottomSheet(
+            //                 isScrollControlled: false,
+            //                 context: context,
+            //                 builder: (Buildercontext) {
+            //                   return FilterPannel();
+            //                 });
+            //           },
+            //           child: Icon(Icons.format_list_bulleted_sharp))
+            //     ],
+            //   ),
+            // ),
             Container(
               height: MediaQuery.sizeOf(context).height / 1.5,
               child: SingleChildScrollView(
@@ -204,6 +206,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       ],
                     ),
+                  ),
+
+                  SizedBox(
+                    child: Carousel_templete(),
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   SizedBox(height: 50, child: Menu_templete()),
                   SizedBox(height: 650, child: Grid_templete()),
@@ -382,6 +391,46 @@ class _FilterPannelState extends State<FilterPannel> {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 5),
+      //padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+            hintText: 'Search...',
+            border: InputBorder.none,
+            icon: Icon(Icons.search),
+            suffix: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                        isScrollControlled: false,
+                        context: context,
+                        builder: (Buildercontext) {
+                          return FilterPannel();
+                        });
+                  },
+                  child: Icon(Icons.format_list_bulleted_sharp)),
+            )),
       ),
     );
   }
