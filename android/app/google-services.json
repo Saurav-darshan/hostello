@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335974452802",
+    "project_id": "hostello-2a88c",
+    "storage_bucket": "hostello-2a88c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335974452802:android:156b23bba91f7d5a21a7db",
+        "android_client_info": {
+          "package_name": "com.example.hostello"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPo-PdWUXa0KseYQ-m3noDg9-XB6i7naY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

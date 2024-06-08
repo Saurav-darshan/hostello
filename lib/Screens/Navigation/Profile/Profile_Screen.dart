@@ -331,8 +331,10 @@ class _Profile_ScreenState extends State<Profile_Screen> {
 
   Future Username() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    var name = sp.getString('person_name');
-    var uri = sp.getString('image_uri');
+    // var name = sp.getString('person_name');
+    // var uri = sp.getString('image_uri');
+    var name = "sa";
+    var uri = "assets/pp.jpg";
 
     setState(() {
       user = name!;

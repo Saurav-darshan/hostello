@@ -1,10 +1,12 @@
-import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hostello/Admin/Admin_Splash.dart';
 import 'package:hostello/Screens/LandingPage.dart';
 import 'package:hostello/Screens/Login/ForgetPasswordScreen.dart';
 import 'package:hostello/Screens/Login/SignupScreen.dart';
-import 'package:http/http.dart';
+import 'package:hostello/auth/User_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,53 +23,57 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isUserNotEmpty = false;
   bool isPasswordNotEmpty = false;
   int status = 0;
+  bool _isSigning = false;
   TextEditingController UsernameController = TextEditingController();
   TextEditingController PasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  void login(String username, String password) async {
-    try {
-      Response response = await post(
-          Uri.parse("https://imapi.mybusi.net/api/auth/signin"),
-          body: {
-            "username": username,
-            "password": password,
-          });
+  //-----------firebase - connection-----
+  final firebaseAuthService _auth = firebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  // void login(String username, String password) async {
+  //   try {
+  //     Response response = await post(
+  //         Uri.parse("https://imapi.mybusi.net/api/auth/signin"),
+  //         body: {
+  //           "username": username,
+  //           "password": password,
+  //         });
 
-      status = response.statusCode;
-      if (response.statusCode == 200) {
-        if (isRemember == true) {
-          saveCredentials();
-        }
-        Map data = jsonDecode(response.body);
-        String name = data["payload"]["name"];
-        String image = data["payload"]["personnel"]["imageUrl"];
-        SharedPreferences sp = await SharedPreferences.getInstance();
-        sp.setString("person_name", name.toString());
-        sp.setString("image_uri", image.toString());
-        sp.setString("role", data["payload"]["roles"].toString());
-        sp.setString("accessToken", data["payload"]["accessToken"].toString());
-        sp.setString(
-            "personnel_id", data["payload"]["personnel"]["id"].toString());
+  //     status = response.statusCode;
+  //     if (response.statusCode == 200) {
+  //       if (isRemember == true) {
+  //         saveCredentials();
+  //       }
+  //       Map data = jsonDecode(response.body);
+  //       String name = data["payload"]["name"];
+  //       String image = data["payload"]["personnel"]["imageUrl"];
+  //       SharedPreferences sp = await SharedPreferences.getInstance();
+  //       sp.setString("person_name", name.toString());
+  //       sp.setString("image_uri", image.toString());
+  //       sp.setString("role", data["payload"]["roles"].toString());
+  //       sp.setString("accessToken", data["payload"]["accessToken"].toString());
+  //       sp.setString(
+  //           "personnel_id", data["payload"]["personnel"]["id"].toString());
 
-        setState(() {
-          ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LandingPage(),
-              ));
-        });
-      } else if (response.statusCode == 401) {
-        print(
-            "RESPONSE:_______${response.statusCode}__________________ ${response.body.toString()}");
-      } else {
-        print(
-            "RESPONSE:_______${response.statusCode}__________________ ${response.body}");
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  //       setState(() {
+  //         ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
+  //         Navigator.pushReplacement(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => LandingPage(),
+  //             ));
+  //       });
+  //     } else if (response.statusCode == 401) {
+  //       print(
+  //           "RESPONSE:_______${response.statusCode}__________________ ${response.body.toString()}");
+  //     } else {
+  //       print(
+  //           "RESPONSE:_______${response.statusCode}__________________ ${response.body}");
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
 
   @override
   void initState() {
@@ -151,31 +157,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             validator: (value) {
                               value = status.toString();
-                              if (value == "404") {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(User_Snack);
-                                return "User Not Found";
-                              } else {
-                                return null;
-                              }
                             },
                             controller: UsernameController,
                             decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.person_3),
-                                hintText: 'Username'),
+                                hintText: 'Email'),
                           ),
                           const SizedBox(height: 40),
                           TextFormField(
                             validator: (value) {
                               value = status.toString();
-                              if (value == "401") {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(Password_Snack);
-
-                                return "Invalid Password";
-                              } else {
-                                return null;
-                              }
                             },
                             obscureText: isObscure,
                             controller: PasswordController,
@@ -238,8 +229,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     isPasswordNotEmpty == true)
                                 ? () {
                                     if (formKey.currentState!.validate()) {
-                                      login(UsernameController.text.toString(),
-                                          PasswordController.text.toString());
+                                      // login(UsernameController.text.toString(),
+                                      //     PasswordController.text.toString());
+                                      Firebase_signin();
                                     } else {
                                       UsernameController.clear();
                                       PasswordController.clear();
@@ -256,23 +248,30 @@ class _LoginScreenState extends State<LoginScreen> {
                               backgroundColor: Color.fromARGB(255, 0, 149, 255),
                               minimumSize: const Size.fromHeight(60),
                             ),
-                            child: const Text(
-                              "LOGIN",
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 243, 243, 243),
-                                  fontSize: 20),
-                            ),
+                            child: _isSigning
+                                ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    "LOGIN",
+                                    style: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 243, 243, 243),
+                                        fontSize: 20),
+                                  ),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignupScreen(),
-                                  ));
+                              // _signInWithGoogle();
+                              showModalBottomSheet(
+                                  isScrollControlled: false,
+                                  context: context,
+                                  builder: (Buildercontext) {
+                                    return otherloginOption();
+                                  });
                             },
                             child: Text(
-                              "Don't have a account ? Signup",
+                              "Try another option",
                               style: const TextStyle(
                                   color: Color.fromARGB(255, 4, 112, 167)),
                             ),
@@ -287,6 +286,64 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+//------firebase signin-----------------\\
+  void Firebase_signin() async {
+    setState(() {
+      _isSigning = true;
+    });
+
+    String email = UsernameController.text;
+    String password = PasswordController.text;
+    User? user = await _auth.signinwithemailandpassword(email, password);
+
+    if (user != null) {
+      print("login");
+      if (isRemember == true) {
+        saveCredentials();
+      }
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LandingPage()));
+      ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
+    } else {
+      print(" error --------->>>>>>>");
+      UsernameController.clear();
+      PasswordController.clear();
+    }
+    setState(() {
+      _isSigning = false;
+    });
+  }
+//---------------google auth signin function-----------------------------\\
+
+  // _signInWithGoogle() async {
+  //   final firebaseAuthService _auth = firebaseAuthService();
+  //   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  //   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  //   try {
+  //     final GoogleSignInAccount? googleSignInAccount =
+  //         await _googleSignIn.signIn();
+
+  //     if (googleSignInAccount != null) {
+  //       final GoogleSignInAuthentication googleSignInAuthentication =
+  //           await googleSignInAccount.authentication;
+
+  //       final AuthCredential credential = GoogleAuthProvider.credential(
+  //         idToken: googleSignInAuthentication.idToken,
+  //         accessToken: googleSignInAuthentication.accessToken,
+  //       );
+
+  //       await _firebaseAuth.signInWithCredential(credential);
+  //       Navigator.pushNamed(context, "/home");
+  //     }
+  //   } catch (e) {
+  //     Fluttertoast.showToast(msg: '"some error occured $e"');
+  //     log("${e}");
+  //   }
+  //}
+
+//------firebase signin-----------------\\
 
   void saveCredentials() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -308,35 +365,238 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(),
         ),
       ));
+}
 
-  final User_Snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.red,
-        ),
-        height: 30,
-        child: Text(
-          "User Not Found !",
-          style: TextStyle(),
-        ),
-      ));
-  final Password_Snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.red,
-        ),
-        height: 30,
-        child: Text(
-          "Invalid Password !",
-          style: TextStyle(),
-        ),
-      ));
+//----------------------------------- other options list  templete-----------------------\\
+class otherloginOption extends StatelessWidget {
+  const otherloginOption({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.sizeOf(context).width,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30), topRight: Radius.circular(30))),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _signInWithGoogle();
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    side: BorderSide(color: Colors.grey),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/google.png',
+                      height: 30.0,
+                    ),
+                    SizedBox(width: 12.0),
+                    Text(
+                      'Sign in with Google',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Add your onPressed code here!
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    side: BorderSide(color: Colors.grey),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 50.0, vertical: 12.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/apple.png',
+                      height: 30.0,
+                    ),
+                    SizedBox(width: 12.0),
+                    Text(
+                      'Sign in with Apple',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Add your onPressed code here!
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    side: BorderSide(color: Colors.grey),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/facebook.png',
+                      height: 30.0,
+                    ),
+                    SizedBox(width: 12.0),
+                    Text(
+                      'Sign in with Facebook',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignupScreen(),
+                  ));
+            },
+            // style: ElevatedButton.styleFrom(
+            //   foregroundColor: Colors.white,
+            //   backgroundColor: Colors.blue,
+            //   // Text color
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(8.0),
+            //     side: BorderSide(color: Colors.grey),
+            //   ),
+            //   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+            // ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // Image.asset(
+                //   'assets/google.png',
+                //   height: 30.0,
+                // ),
+
+                Text(
+                  "Don't have a account ? Signup",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Admin_SplashScreen(),
+                  ));
+            },
+            // style: ElevatedButton.styleFrom(
+            //   foregroundColor: Colors.white,
+            //   backgroundColor: Colors.blue,
+            //   // Text color
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(8.0),
+            //     side: BorderSide(color: Colors.grey),
+            //   ),
+            //   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+            // ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // Image.asset(
+                //   'assets/google.png',
+                //   height: 30.0,
+                // ),
+
+                Text(
+                  "Admin Login",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _signInWithGoogle() async {
+    final firebaseAuthService _auth = firebaseAuthService();
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await _googleSignIn.signIn();
+
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+          accessToken: googleSignInAuthentication.accessToken,
+        );
+
+        await _firebaseAuth.signInWithCredential(credential);
+        // Navigator.pushNamed(context, "/home");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '"some error occured $e"');
+    }
+  }
 }

@@ -43,8 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: CircleAvatar(
                 backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                foregroundImage: NetworkImage(
-                    "https://imindsbucket.s3.ap-south-1.amazonaws.com/${image_uri}"),
+                foregroundImage: NetworkImage(image_uri),
               ),
             ),
           ),
@@ -228,8 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future Username() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    var name = sp.getString('person_name');
-    var uri = sp.getString('image_uri');
+    // var name = sp.getString('person_name');
+    // var uri = sp.getString('image_uri');
+    var name = "sa";
+    var uri = "/assets/pp.jpg";
 
     setState(() {
       user = name!;
