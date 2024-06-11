@@ -1,5 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hostello/Admin/Admin_AddHostelDetail.dart';
+import 'package:hostello/Admin/Admin_homePage.dart';
 import 'package:hostello/Colors/Colors.dart';
 
 class Admin_LandingScreen extends StatefulWidget {
@@ -10,8 +12,11 @@ class Admin_LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<Admin_LandingScreen> {
-  int _page = 2;
-  List<Widget> Widgetlist = [];
+  int _page = 0;
+  List<Widget> Widgetlist = [
+    Admin_HomeScreen(),
+    Admin_AddHostelDetail(),
+  ];
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
