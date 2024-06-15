@@ -31,6 +31,7 @@ class _LandingPageState extends State<LandingPage> {
     return SafeArea(
       top: false,
       child: Scaffold(
+          resizeToAvoidBottomInset: true,
           bottomNavigationBar: CurvedNavigationBar(
             height: 60,
             index: _page,

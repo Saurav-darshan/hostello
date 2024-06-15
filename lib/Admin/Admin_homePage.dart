@@ -161,15 +161,15 @@ Card _buildCard(String title, String count, IconData icon, Color color) {
     color: Ccolor.p1,
     elevation: 4,
     child: Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(5.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(icon, size: 50, color: color),
+          Icon(icon, size: 40, color: color),
           SizedBox(height: 10),
           Text(
             title,
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 16),
           ),
           Text(
             count,
