@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Colors/Colors.dart';
 
@@ -10,6 +11,43 @@ class Admin_HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<Admin_HomeScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<int> getTotalHostels() {
+    return _firestore
+        .collection('hostels')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
+  Stream<int> getTotalEnquiries() {
+    return _firestore
+        .collection('enquiries')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
+  Stream<int> getTodayEnquiries() {
+    DateTime today = DateTime.now();
+    DateTime startOfDay = DateTime(today.year, today.month, today.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
+
+    return _firestore
+        .collection('enquiries')
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+        .where('timestamp', isLessThan: endOfDay)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
+  Stream<int> getRejectedEnquiries() {
+    return _firestore
+        .collection('enquiries')
+        .where('status', isEqualTo: 'rejected')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -85,14 +123,14 @@ class _HomeScreenState extends State<Admin_HomeScreen> {
                     crossAxisSpacing: 16.0,
                     mainAxisSpacing: 16.0,
                     children: <Widget>[
-                      _buildCard(
-                          'Total Hostels', '25', Icons.hotel, Colors.blue),
-                      _buildCard(
-                          'Bookings Today', '7', Icons.book, Colors.green),
-                      _buildCard(
-                          'Available Rooms', '120', Icons.room, Colors.orange),
-                      _buildCard(
-                          'Pending Requests', '3', Icons.pending, Colors.red),
+                      _buildStreamCard('Total Hostels', getTotalHostels(),
+                          Icons.hotel, Colors.blue),
+                      _buildStreamCard('Total Enquiries', getTotalEnquiries(),
+                          Icons.book, Colors.green),
+                      _buildStreamCard('Today\'s Enquiries',
+                          getTodayEnquiries(), Icons.today, Colors.orange),
+                      _buildStreamCard('Rejected Enquiries',
+                          getRejectedEnquiries(), Icons.pending, Colors.red),
                     ],
                   ),
                 ),
@@ -103,7 +141,42 @@ class _HomeScreenState extends State<Admin_HomeScreen> {
               ],
             )));
   }
+
+  Card _buildStreamCard(
+      String title, Stream<int> stream, IconData icon, Color color) {
+    return Card(
+      color: Ccolor.p1,
+      elevation: 4,
+      child: StreamBuilder<int>(
+        stream: stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return Padding(
+            padding: EdgeInsets.all(5.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(icon, size: 40, color: color),
+                SizedBox(height: 10),
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 16),
+                ),
+                Text(
+                  snapshot.data.toString(),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
+
 //----------------------------Carousel templete---------------->>
 
 class Carousel_templete extends StatefulWidget {
@@ -154,29 +227,4 @@ class _Carousel_templeteState extends State<Carousel_templete> {
       }).toList(),
     );
   }
-}
-
-Card _buildCard(String title, String count, IconData icon, Color color) {
-  return Card(
-    color: Ccolor.p1,
-    elevation: 4,
-    child: Padding(
-      padding: EdgeInsets.all(5.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(icon, size: 40, color: color),
-          SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16),
-          ),
-          Text(
-            count,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ),
-  );
 }

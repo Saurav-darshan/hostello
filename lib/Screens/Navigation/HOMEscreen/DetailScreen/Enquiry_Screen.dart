@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/LandingPage.dart';
 
@@ -15,6 +16,8 @@ class _BookingScreenState extends State<BookingScreen> {
   String _mobileNo = '';
   String _email = '';
   String _gender = '';
+  String _hostelname = "Rama Girls\n Hostel";
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +93,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Taj Boys\n Hostel",
+                            _hostelname,
                             overflow: TextOverflow.clip,
                             maxLines: 2,
                             style: TextStyle(
@@ -127,7 +130,6 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
             ),
             Card(
-                // color: Color.fromARGB(255, 200, 203, 206),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
@@ -230,7 +232,6 @@ class _BookingScreenState extends State<BookingScreen> {
                             surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
                             shape: StadiumBorder(),
                             elevation: 20,
-                            //shadowColor: myColor,
                             backgroundColor: Color.fromARGB(255, 0, 149, 255),
                             minimumSize: const Size.fromHeight(60),
                           ),
@@ -255,11 +256,26 @@ class _BookingScreenState extends State<BookingScreen> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      // Process enqurie with the entered data
+      _saveEnquiryToFirestore();
       print('Name: $_name');
       print('Mobile No: $_mobileNo');
       print('Email: $_email');
       print('Gender: $_gender');
+    }
+  }
+
+  Future<void> _saveEnquiryToFirestore() async {
+    try {
+      await _firestore.collection('enquiries').add({
+        'name': _name,
+        'mobileNo': _mobileNo,
+        'email': _email,
+        'gender': _gender,
+        'hostelname': _hostelname,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error saving enquiry: $e');
     }
   }
 }
@@ -333,23 +349,3 @@ class thanks_templete extends StatelessWidget {
     );
   }
 }
-
-// class confirm_templete extends StatelessWidget {
-//   const confirm_templete({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: MediaQuery.sizeOf(context).width,
-//       height: MediaQuery.sizeOf(context).height,
-//       decoration: BoxDecoration(
-//           color: const Color.fromARGB(255, 255, 255, 255),
-//           borderRadius: BorderRadius.only(
-//               topLeft: Radius.circular(50), topRight: Radius.circular(50))),
-//       child: CircleAvatar(
-//         foregroundImage: AssetImage("assets/like_icon.png"),
-//         backgroundColor: const Color.fromARGB(255, 178, 14, 14),
-//       ),
-//     );
-//   }
-// }

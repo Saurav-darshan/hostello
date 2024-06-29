@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hostello/Admin/Admin_AddHostelDetail.dart';
 import 'package:hostello/Admin/Admin_ViewHostelDetail.dart';
 import 'package:hostello/Admin/Admin_homePage.dart';
+import 'package:hostello/Admin/Admin_viewEnquriy.dart';
 import 'package:hostello/Colors/Colors.dart';
 
 class Admin_LandingScreen extends StatefulWidget {
@@ -17,7 +18,8 @@ class _LandingScreenState extends State<Admin_LandingScreen> {
   List<Widget> Widgetlist = [
     Admin_HomeScreen(),
     Admin_AddHostelDetail(),
-    Admin_ViewHostelDetails()
+    Admin_ViewHostelDetails(),
+    Admin_ViewEnquiriesScreen(),
   ];
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   @override

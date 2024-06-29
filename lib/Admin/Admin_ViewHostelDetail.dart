@@ -18,7 +18,15 @@ class _AdminViewHostelDetailsState extends State<Admin_ViewHostelDetails> {
       backgroundColor: Ccolor.p1,
       appBar: AppBar(
         backgroundColor: Ccolor.p1,
-        title: Text('Hostel Details'),
+        title: Text(
+          'Hostel Details',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Montserrat',
+          ),
+        ),
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('hostels').snapshots(),
@@ -28,7 +36,9 @@ class _AdminViewHostelDetailsState extends State<Admin_ViewHostelDetails> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No hostels found'));
+            return Center(
+                child: Text('No hostels found',
+                    style: TextStyle(color: Colors.black54)));
           }
 
           var hostels = snapshot.data!.docs;
@@ -38,33 +48,149 @@ class _AdminViewHostelDetailsState extends State<Admin_ViewHostelDetails> {
             itemBuilder: (context, index) {
               var hostel = hostels[index].data() as Map<String, dynamic>;
               return Card(
-                margin: EdgeInsets.all(10),
+                margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: ListTile(
-                  leading: hostel['imageUrls'] != null &&
-                          hostel['imageUrls'].isNotEmpty
-                      ? Image.network(
-                          hostel['imageUrls'][0],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(Icons.image),
-                  title: Text(hostel['name'] ?? 'No name provided'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                elevation: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(15.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Ccolor.p2, Ccolor.p3],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                          'Address: ${hostel['address'] ?? 'No address provided'}'),
-                      Text(
-                          'Rent: ${hostel['rent']?.toString() ?? 'No rent provided'}'),
-                      Text('Type: ${hostel['type'] ?? 'No type provided'}'),
-                      Text(
-                          'Overview: ${hostel.containsKey('overview') ? hostel['overview'] : 'No overview provided'}'),
-                      Text(
-                          'Facilities: ${(hostel['facilities'] != null && hostel['facilities'].isNotEmpty) ? hostel['facilities'].join(', ') : 'No facilities provided'}'),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: hostel['imageUrls'] != null &&
+                                hostel['imageUrls'].isNotEmpty
+                            ? Image.network(
+                                hostel['imageUrls'][0],
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.image,
+                                    size: 50, color: Colors.grey[700]),
+                              ),
+                      ),
+                      SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              hostel['name'] ?? 'No name provided',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.location_on,
+                                    color: Colors.white, size: 16),
+                                SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    hostel['address'] ?? 'No address provided',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.money,
+                                    color: Colors.white, size: 16),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Rent: ${hostel['rent']?.toString() ?? 'No rent provided'}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.category,
+                                    color: Colors.white, size: 16),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Type: ${hostel['type'] ?? 'No type provided'}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.info, color: Colors.white, size: 16),
+                                SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    'Overview: ${hostel.containsKey('overview') ? hostel['overview'] : 'No overview provided'}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.featured_play_list,
+                                    color: Colors.white, size: 16),
+                                SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    'Facilities: ${(hostel['facilities'] != null && hostel['facilities'].isNotEmpty) ? hostel['facilities'].join(', ') : 'No facilities provided'}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
