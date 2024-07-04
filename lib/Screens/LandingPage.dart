@@ -16,10 +16,8 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   int _page = 2;
   List<Widget> Widgetlist = [
-    Fav_Screen(),
-    //Notification_templete(),
-    //Grid_templete(),
-    Search_Screen(),
+    LikedHostelsScreen(),
+    SearchScreen(),
     HomeScreen(),
     Message_Screen(),
     Profile_Screen()

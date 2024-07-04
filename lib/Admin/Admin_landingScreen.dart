@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Admin/Admin_AddHostelDetail.dart';
+import 'package:hostello/Admin/Admin_ProfileScreen.dart';
 import 'package:hostello/Admin/Admin_ViewHostelDetail.dart';
 import 'package:hostello/Admin/Admin_homePage.dart';
 import 'package:hostello/Admin/Admin_viewEnquriy.dart';
@@ -14,12 +15,13 @@ class Admin_LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<Admin_LandingScreen> {
-  int _page = 0;
+  int _page = 2;
   List<Widget> Widgetlist = [
-    Admin_HomeScreen(),
     Admin_AddHostelDetail(),
     Admin_ViewHostelDetails(),
+    Admin_HomeScreen(),
     Admin_ViewEnquiriesScreen(),
+    AdminProfileScreen(),
   ];
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   @override
@@ -35,7 +37,7 @@ class _LandingScreenState extends State<Admin_LandingScreen> {
         animationCurve: Curves.linearToEaseOut,
         items: <Widget>[
           Icon(
-            Icons.favorite,
+            Icons.add_business_rounded,
             color: Colors.white,
           ),
           Icon(

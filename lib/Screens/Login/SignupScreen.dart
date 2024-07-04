@@ -21,6 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final firebaseAuthService _auth = firebaseAuthService();
   String _gender = '';
+  String _role = 'user'; // Default role is user
   bool isObscure = true;
 
   @override
@@ -167,7 +168,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           Row(
                             children: [
                               Text(
-                                'Gender :',
+                                'Gender:',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               Radio(
@@ -190,6 +191,35 @@ class _SignupScreenState extends State<SignupScreen> {
                                 },
                               ),
                               Text('Female'),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Text(
+                                'Sign up as:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Radio(
+                                value: 'user',
+                                groupValue: _role,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _role = value!;
+                                  });
+                                },
+                              ),
+                              Text('User'),
+                              Radio(
+                                value: 'admin',
+                                groupValue: _role,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _role = value!;
+                                  });
+                                },
+                              ),
+                              Text('Admin'),
                             ],
                           ),
                           SizedBox(height: 20),
@@ -227,7 +257,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               );
                             },
                             child: Text(
-                              "Already have a account ? Login",
+                              "Already have a account? Login",
                               style: const TextStyle(
                                 color: Color.fromARGB(255, 4, 112, 167),
                               ),
@@ -255,6 +285,7 @@ class _SignupScreenState extends State<SignupScreen> {
     String password = _passwordController.text;
     String mobile = _mobileNoController.text;
     String gender = _gender;
+    String role = _role;
     User? user = await _auth.signupwithemailandpassword(email, password);
 
     if (user != null) {
@@ -263,16 +294,8 @@ class _SignupScreenState extends State<SignupScreen> {
         email: email,
         mobile: mobile,
         gender: gender,
+        role: role,
       ));
-      // final firestore = FirebaseFirestore.instance.collection("users");
-      // String id = firestore.doc().id;
-
-      // firestore.doc(id).set({
-      //   "username": username,
-      //   "email": email,
-      //   "mobile": mobile,
-      //   "gender": gender,
-      // });
       print("user created");
       ScaffoldMessenger.of(context).showSnackBar(Signup_snack);
 
@@ -292,22 +315,23 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-//------------------------------------------------------------------------\\
-//---------->>>>> .  add data to firebase  <<<----------------------\\
+  //------------------------------------------------------------------------\\
+  //---------->>>>> .  add data to firebase  <<<----------------------\\
   void _createData(UserModel userModel) {
     final userCollection = FirebaseFirestore.instance.collection("users");
 
-    String? id = userCollection.doc().id;
+    String? uid = FirebaseAuth.instance.currentUser?.uid ?? userModel.id;
 
     final newUser = UserModel(
       username: userModel.username,
       email: userModel.email,
       mobile: userModel.mobile,
       gender: userModel.gender,
-      id: id,
+      role: userModel.role,
+      id: uid,
     ).toJson();
 
-    userCollection.doc(id).set(newUser);
+    userCollection.doc(uid).set(newUser);
   }
 
   //---------->>>>> .  update data of firebase  <<<----------------------\\
@@ -318,12 +342,13 @@ class _SignupScreenState extends State<SignupScreen> {
             email: userModel.email,
             mobile: userModel.mobile,
             gender: userModel.gender,
+            role: userModel.role,
             id: userModel.id)
         .toJson();
 
     userCollection.doc(userModel.id).update(newUser);
   }
-//---------->>>>> .  read data of firebase  <<<----------------------\\
+  //---------->>>>> .  read data of firebase  <<<----------------------\\
 
   void _submitForm() {
     final form = _formKey.currentState;
@@ -337,6 +362,7 @@ class _SignupScreenState extends State<SignupScreen> {
       print('Email: ${_emailController.text}');
       print('Password: ${_passwordController.text}');
       print('Gender: $_gender');
+      print('Role: $_role');
     }
   }
 

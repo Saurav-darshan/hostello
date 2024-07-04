@@ -3,7 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:hostello/Screens/LandingPage.dart';
 
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({super.key});
+  final String hostelname;
+  final String address;
+  final String rating;
+  final String price;
+  final String image;
+
+  const BookingScreen({
+    Key? key,
+    required this.hostelname,
+    required this.address,
+    required this.rating,
+    required this.price,
+    required this.image,
+  }) : super(key: key);
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -16,14 +29,12 @@ class _BookingScreenState extends State<BookingScreen> {
   String _mobileNo = '';
   String _email = '';
   String _gender = '';
-  String _hostelname = "Rama Girls\n Hostel";
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
         title: Text("Enquiry Summary"),
         centerTitle: false,
       ),
@@ -31,16 +42,15 @@ class _BookingScreenState extends State<BookingScreen> {
         child: Column(
           children: [
             Card(
-              surfaceTintColor: Colors.white,
-              elevation: Checkbox.width,
+              elevation: 5,
               margin: EdgeInsets.all(10),
               child: Container(
-                height: MediaQuery.sizeOf(context).height / 6,
+                height: MediaQuery.of(context).size.height / 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Stack(
                         children: [
@@ -49,8 +59,8 @@ class _BookingScreenState extends State<BookingScreen> {
                             width: MediaQuery.of(context).size.width / 3,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(30),
-                              child: Image.asset(
-                                "assets/h6.jpeg",
+                              child: Image.network(
+                                widget.image,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -75,7 +85,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                     size: 15,
                                   ),
                                   Text(
-                                    "4.5",
+                                    widget.rating,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       color: Colors.blue[800],
@@ -88,14 +98,17 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(
+                        width: 15,
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _hostelname,
-                            overflow: TextOverflow.clip,
-                            maxLines: 2,
+                            widget.hostelname,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 20,
@@ -103,19 +116,15 @@ class _BookingScreenState extends State<BookingScreen> {
                             ),
                           ),
                           Text(
-                            "kankarbagh patna",
+                            widget.address,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 13,
                             ),
                           ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
                           Text(
-                            "₹ 3000\n /mo",
+                            "${widget.price} /mo",
+                            overflow: TextOverflow.fade,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -123,129 +132,148 @@ class _BookingScreenState extends State<BookingScreen> {
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      // Column(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //     Text(
+                      //       "${widget.price} \n/mo",
+                      //       overflow: TextOverflow.fade,
+                      //       style: TextStyle(
+                      //         color: Colors.black,
+                      //         fontSize: 15,
+                      //         fontWeight: FontWeight.w800,
+                      //       ),
+                      //     ),
+
+                      //   ],
+                      //  )
                     ],
                   ),
                 ),
               ),
             ),
             Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30))),
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Let's Connect",
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Let's Connect",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        decoration: InputDecoration(
+                            hintText: 'Name', prefixIcon: Icon(Icons.person)),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) => _name = value!,
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        decoration: InputDecoration(
+                            hintText: 'Mobile No',
+                            prefixIcon: Icon(Icons.phone)),
+                        validator: (value) {
+                          if (value!.isEmpty || value.length != 10) {
+                            return 'Please enter a 10-digit mobile number';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.phone,
+                        onSaved: (value) => _mobileNo = value!,
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        decoration: InputDecoration(
+                            hintText: 'Email', prefixIcon: Icon(Icons.email)),
+                        validator: (value) {
+                          if (value!.isEmpty || !value.contains('@')) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                        onSaved: (value) => _email = value!,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Text(
+                            'Gender :',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Radio(
+                            value: 'Male',
+                            groupValue: _gender,
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value!;
+                              });
+                            },
+                          ),
+                          Text('Male'),
+                          Radio(
+                            value: 'Female',
+                            groupValue: _gender,
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value!;
+                              });
+                            },
+                          ),
+                          Text('Female'),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          _submitForm();
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (BuildContext) {
+                              return thanks_templete();
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
+                          shape: StadiumBorder(),
+                          elevation: 20,
+                          backgroundColor: Color.fromARGB(255, 0, 149, 255),
+                          minimumSize: const Size.fromHeight(60),
+                        ),
+                        child: const Text(
+                          "Contact Us",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w500),
+                              color: Color.fromARGB(255, 243, 243, 243),
+                              fontSize: 20),
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              hintText: 'Name', prefixIcon: Icon(Icons.person)),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) => _name = value!,
-                        ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              hintText: 'Mobile No',
-                              prefixIcon: Icon(Icons.phone)),
-                          validator: (value) {
-                            if (value!.isEmpty || value.length != 10) {
-                              return 'Please enter a 10-digit mobile number';
-                            }
-                            return null;
-                          },
-                          keyboardType: TextInputType.phone,
-                          onSaved: (value) => _mobileNo = value!,
-                        ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              hintText: 'Email', prefixIcon: Icon(Icons.email)),
-                          validator: (value) {
-                            if (value!.isEmpty || !value.contains('@')) {
-                              return 'Please enter a valid email address';
-                            }
-                            return null;
-                          },
-                          keyboardType: TextInputType.emailAddress,
-                          onSaved: (value) => _email = value!,
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Text(
-                              'Gender :',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Radio(
-                              value: 'Male',
-                              groupValue: _gender,
-                              onChanged: (value) {
-                                setState(() {
-                                  _gender = value!;
-                                });
-                              },
-                            ),
-                            Text('Male'),
-                            Radio(
-                              value: 'Female',
-                              groupValue: _gender,
-                              onChanged: (value) {
-                                setState(() {
-                                  _gender = value!;
-                                });
-                              },
-                            ),
-                            Text('Female'),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            _submitForm();
-                            showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (BuildContext) {
-                                  return thanks_templete();
-                                });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
-                            shape: StadiumBorder(),
-                            elevation: 20,
-                            backgroundColor: Color.fromARGB(255, 0, 149, 255),
-                            minimumSize: const Size.fromHeight(60),
-                          ),
-                          child: const Text(
-                            "Contact Us",
-                            style: TextStyle(
-                                color: Color.fromARGB(255, 243, 243, 243),
-                                fontSize: 20),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -271,7 +299,8 @@ class _BookingScreenState extends State<BookingScreen> {
         'mobileNo': _mobileNo,
         'email': _email,
         'gender': _gender,
-        'hostelname': _hostelname,
+        'hostelname': widget
+            .hostelname, // Use widget.hostelname to access the passed data
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {

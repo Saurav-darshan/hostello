@@ -28,7 +28,7 @@ class _OurRecommendationState extends State<OurRecommendation> {
           Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 170,
-              child: Grid_templete()),
+              child: GridTemplate()),
         ],
       ),
     );

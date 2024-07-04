@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class productdata {
   List<String> image = [
     "h1.jpeg",
@@ -61,3 +63,13 @@ class Item {
   @override
   bool operator ==(Object other) => other is Item && other.id == id;
 }
+
+Map<String, IconData> iconMap = {
+  'Watchman': Icons.security,
+  'Parking': Icons.local_parking,
+  'WiFi': Icons.wifi,
+  'Laundry': Icons.local_laundry_service,
+  'Mess': Icons.restaurant,
+  'CCTV': Icons.videocam,
+  'Water Cooler': Icons.local_drink,
+};

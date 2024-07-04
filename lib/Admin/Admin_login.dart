@@ -1,23 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hostello/Admin/Admin_ForgetPassword.dart';
 import 'package:hostello/Admin/Admin_landingScreen.dart';
 import 'package:hostello/Colors/Colors.dart';
+import 'package:hostello/Screens/Login/LoginScreen.dart';
 
 class Admin_LoginScreen extends StatefulWidget {
-  const Admin_LoginScreen({super.key});
+  const Admin_LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<Admin_LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<Admin_LoginScreen> {
-  bool isRemember = false;
   bool isObscure = true;
-  bool isUserNotEmpty = false;
-  bool isPasswordNotEmpty = false;
-  int status = 0;
-  TextEditingController UsernameController = TextEditingController();
-  TextEditingController PasswordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,200 +30,236 @@ class _LoginScreenState extends State<Admin_LoginScreen> {
         child: Stack(
           children: [
             Container(
-              height: MediaQuery.sizeOf(context).height / 3,
+              height: MediaQuery.of(context).size.height / 3,
               alignment: Alignment.bottomCenter,
               decoration: BoxDecoration(
-                  color: Ccolor.p3,
-                  borderRadius: BorderRadiusDirectional.only(
-                    bottomEnd: Radius.circular(200),
-                  )),
+                color: Ccolor.p3,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(200),
+                  bottomRight: Radius.circular(200),
+                ),
+              ),
             ),
             Align(
-                alignment: Alignment(0, -.7),
-                child: Image.asset("assets/logo.png")),
+              alignment: Alignment(0, -0.7),
+              child: Image.asset("assets/logo.png"),
+            ),
             Positioned(
               bottom: 0,
               child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Card(
-                    color: Ccolor.p1,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                    child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: Form(
-                        key: formKey,
-                        child: Column(children: [
-                          // Text(
-                          //   "LOGIN",
-                          //   style: TextStyle(
-                          //       color: Colors.black,
-                          //       fontSize: 22,
-                          //       fontWeight: FontWeight.w500),
-                          // ),
-                          // const SizedBox(height: 20),
+                width: MediaQuery.of(context).size.width,
+                child: Card(
+                  color: Ccolor.p1,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
                           TextFormField(
-                            validator: (value) {
-                              value = status.toString();
-                              if (value == "404") {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(User_Snack);
-                                return "User Not Found";
-                              } else {
-                                return null;
-                              }
-                            },
-                            controller: UsernameController,
+                            controller: usernameController,
                             decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.person_3),
-                                hintText: 'Username'),
-                          ),
-                          const SizedBox(height: 40),
-                          TextFormField(
+                              prefixIcon: Icon(Icons.person),
+                              hintText: 'Username',
+                            ),
                             validator: (value) {
-                              value = status.toString();
-                              if (value == "401") {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(Password_Snack);
-
-                                return "Invalid Password";
-                              } else {
-                                return null;
+                              if (value!.isEmpty) {
+                                return 'Please enter your username';
                               }
+                              return null;
                             },
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: passwordController,
                             obscureText: isObscure,
-                            controller: PasswordController,
                             decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.password_rounded),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    if (isObscure == true) {
-                                      setState(() {
-                                        isObscure = false;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        isObscure = true;
-                                      });
-                                    }
-                                  },
-                                  child: isObscure == false
-                                      ? Icon(Icons.visibility_off_rounded)
-                                      : Icon(Icons.visibility_rounded),
+                              prefixIcon: Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  isObscure
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
-                                hintText: 'Password'),
+                                onPressed: () {
+                                  setState(() {
+                                    isObscure = !isObscure;
+                                  });
+                                },
+                              ),
+                              hintText: 'Password',
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              return null;
+                            },
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Row(children: [
-                                Checkbox(
-                                    value: isRemember,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        isRemember = value!;
-                                      });
-                                    }),
-                                Text(
-                                  "Remember Me",
-                                  style: const TextStyle(color: Ccolor.p4),
-                                ),
-                              ]),
                               TextButton(
                                 onPressed: () {
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) =>
-                                  //             ForgetPasswordScreen()));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          Admin_ForgetPassword(),
+                                    ),
+                                  );
                                 },
                                 child: Text(
-                                  "Forgot password ?",
-                                  style: const TextStyle(color: Ccolor.p4),
+                                  'Forgot password?',
+                                  style: TextStyle(color: Ccolor.p4),
                                 ),
-                              )
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Admin_LandingScreen()));
+                              if (formKey.currentState!.validate()) {
+                                _login();
+                              }
                             },
                             style: ElevatedButton.styleFrom(
-                              surfaceTintColor: Ccolor.p3,
+                              backgroundColor: Ccolor.p3,
                               shape: StadiumBorder(),
                               elevation: 20,
-                              //shadowColor: myColor,
-                              backgroundColor: Ccolor.p3,
-                              minimumSize: const Size.fromHeight(60),
+                              minimumSize: Size.fromHeight(60),
                             ),
-                            child: const Text(
-                              "LOGIN",
+                            child: Text(
+                              'LOGIN',
                               style: TextStyle(
-                                  color: Color.fromARGB(255, 243, 243, 243),
-                                  fontSize: 20),
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
+                          SizedBox(height: 20),
                           TextButton(
                             onPressed: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (context) => SignupScreen(),
-                              //     ));
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ),
+                              );
                             },
                             child: Text(
-                              "Don't have a account ? Signup",
-                              style: const TextStyle(color: Ccolor.p4),
+                              'User Login? Click Here!',
+                              style: TextStyle(color: Ccolor.p4),
                             ),
                           ),
-                        ]),
+                        ],
                       ),
                     ),
-                  )),
-            )
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  final User_Snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.red,
-        ),
-        height: 30,
-        child: Text(
-          "User Not Found !",
-          style: TextStyle(),
-        ),
-      ));
-  final Password_Snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.red,
-        ),
-        height: 30,
-        child: Text(
-          "Invalid Password !",
-          style: TextStyle(),
-        ),
-      ));
+  void _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: usernameController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      // Check user's role
+      _checkUserRole(userCredential.user!.uid);
+    } catch (e) {
+      // Handle login errors
+      if (e is FirebaseAuthException) {
+        if (e.code == 'invalid-email') {
+          usernameController.clear();
+          passwordController.clear();
+          Fluttertoast.showToast(
+            msg: 'User not found',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        } else if (e.code == 'invalid-credential') {
+          passwordController..clear();
+          Fluttertoast.showToast(
+            msg: 'Invalid password',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        } else {
+          print('Firebase login error: $e');
+          Fluttertoast.showToast(
+            msg: "Error: ${e}",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+          );
+        }
+      }
+    }
+  }
+
+  void _checkUserRole(String uid) async {
+    try {
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (userDoc.exists) {
+        String role = userDoc.get('role');
+        if (role == 'admin') {
+          // Navigate to admin landing screen on successful login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Admin_LandingScreen()),
+          );
+        } else {
+          passwordController.clear();
+          usernameController.clear();
+          Fluttertoast.showToast(
+            msg: 'Access Denied: Admins Only',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } else {
+        passwordController.clear();
+        usernameController.clear();
+        Fluttertoast.showToast(
+          msg: 'User role not found',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error checking user role: $e');
+      Fluttertoast.showToast(
+        msg: 'Error checking user role',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
 }

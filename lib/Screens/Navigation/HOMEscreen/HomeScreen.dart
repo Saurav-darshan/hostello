@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/NotificationScreen.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/OurRecommendation.dart';
@@ -6,7 +8,7 @@ import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Featured_templet
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/Grid_templete.dart';
 import 'package:hostello/Screens/Navigation/HOMEscreen/Templete/menu_templete.dart';
 import 'package:hostello/Screens/Navigation/Profile/Profile_Screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hostello/Screens/Navigation/Search_Screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,12 +18,31 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String user = "User";
-  String image_uri = "";
+  String userName = "";
+  String imageUri = "";
+
   @override
   void initState() {
-    Username();
     super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc['username'] ?? 'User';
+          //imageUri = userDoc['imageUri'] ?? '';
+        });
+      }
+    }
   }
 
   @override
@@ -37,14 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
             child: InkWell(
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Profile_Screen(),
-                    ));
+                  context,
+                  MaterialPageRoute(builder: (context) => Profile_Screen()),
+                );
               },
               child: CircleAvatar(
                 backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                foregroundImage: NetworkImage(image_uri),
+                foregroundImage: NetworkImage(imageUri),
+                child: imageUri.isEmpty ? Icon(Icons.person) : null,
               ),
             ),
           ),
@@ -52,18 +73,21 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.only(right: 20),
               child: IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotificationScreen(),
-                        ));
-                  },
-                  icon: Icon(Icons.notifications),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(
-                          Color.fromARGB(158, 232, 233, 232)))),
-            )
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NotificationScreen()),
+                  );
+                },
+                icon: Icon(Icons.notifications),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                    Color.fromARGB(158, 232, 233, 232),
+                  ),
+                ),
+              ),
+            ),
           ],
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,16 +95,18 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "Good Morning 👋",
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500),
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
-                user,
+                userName,
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800),
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
@@ -89,154 +115,88 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Column(
           children: [
             SearchBar(),
-            // Container(
-            //   margin: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
-            //   padding:
-            //       EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(10),
-            //     color: Color.fromARGB(40, 158, 158, 158),
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Row(
-            //         children: [Icon(Icons.search), Text('Search')],
-            //       ),
-            //       InkWell(
-            //           onTap: () {
-            //             showModalBottomSheet(
-            //                 isScrollControlled: false,
-            //                 context: context,
-            //                 builder: (Buildercontext) {
-            //                   return FilterPannel();
-            //                 });
-            //           },
-            //           child: Icon(Icons.format_list_bulleted_sharp))
-            //     ],
-            //   ),
-            // ),
             Container(
               height: MediaQuery.sizeOf(context).height / 1.5,
               child: SingleChildScrollView(
-                child: Column(children: [
-                  // Container(
-                  //   margin: EdgeInsets.only(
-                  //       left: 10, right: 10, top: 20, bottom: 20),
-                  //   padding: EdgeInsets.only(
-                  //       left: 10, right: 10, top: 10, bottom: 10),
-                  //   decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(10),
-                  //     color: Color.fromARGB(40, 158, 158, 158),
-                  //   ),
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Row(
-                  //         children: [Icon(Icons.search), Text('Search')],
-                  //       ),
-                  //       InkWell(
-                  //           onTap: () {
-                  //             showModalBottomSheet(
-                  //                 isScrollControlled: false,
-                  //                 context: context,
-                  //                 builder: (Buildercontext) {
-                  //                   return FilterPannel();
-                  //                 });
-                  //           },
-                  //           child: Icon(Icons.format_list_bulleted_sharp))
-                  //     ],
-                  //   ),
-                  // ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Featured",
-                          style: TextStyle(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Featured",
+                            style: TextStyle(
                               color: Colors.black,
                               fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "See All",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 2.2,
-                    child: FeaturedTemplate(),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Our Recommendation",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OurRecommendation(),
-                                ));
-                          },
-                          child: Text(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
                             "See All",
                             style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 2.2,
+                      child: FeaturedTemplate(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Our Recommendation",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => OurRecommendation()),
+                              );
+                            },
+                            child: Text(
+                              "See All",
+                              style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 15,
-                                fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-
-                  SizedBox(
-                    child: Carousel_templete(),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(height: 50, child: Menu_templete()),
-                  SizedBox(height: 650, child: Grid_templete()),
-                ]),
+                    SizedBox(
+                      child: Carousel_templete(),
+                    ),
+                    SizedBox(height: 20),
+                    SizedBox(height: 50, child: Menu_templete()),
+                    SizedBox(height: 650, child: GridTemplate()),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-  //-------------->   getting User name<-----------------\\
-
-  Future Username() async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    // var name = sp.getString('person_name');
-    // var uri = sp.getString('image_uri');
-    var name = "sa";
-    var uri = "/assets/pp.jpg";
-
-    setState(() {
-      user = name!;
-      image_uri = uri!;
-    });
   }
 }
 
@@ -251,13 +211,24 @@ class _FilterPannelState extends State<FilterPannel> {
   RangeValues values = const RangeValues(1000, 20000);
   List<DropdownMenuEntry<String>> address = [
     DropdownMenuEntry(
-        value: "Rajendra Nagar, Patna", label: "Rajendra Nagar, Patna"),
-    DropdownMenuEntry(value: "Frazer Road, Patna", label: "Frazer Road, Patna"),
+      value: "Rajendra Nagar, Patna",
+      label: "Rajendra Nagar, Patna",
+    ),
     DropdownMenuEntry(
-        value: "Phulwari Sharif, Patna", label: "Phulwari Sharif, Patna"),
-    DropdownMenuEntry(value: "Bailey Road, Patna", label: "Bailey Road, Patna"),
+      value: "Frazer Road, Patna",
+      label: "Frazer Road, Patna",
+    ),
+    DropdownMenuEntry(
+      value: "Phulwari Sharif, Patna",
+      label: "Phulwari Sharif, Patna",
+    ),
+    DropdownMenuEntry(
+      value: "Bailey Road, Patna",
+      label: "Bailey Road, Patna",
+    ),
   ];
-  String DropdownValue = "Select Location";
+  String dropdownValue = "Select Location";
+
   @override
   Widget build(BuildContext context) {
     RangeLabels labels =
@@ -272,13 +243,12 @@ class _FilterPannelState extends State<FilterPannel> {
             Text(
               "Category",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             SizedBox(
               height: 40,
               width: MediaQuery.sizeOf(context).width,
@@ -287,36 +257,35 @@ class _FilterPannelState extends State<FilterPannel> {
             Text(
               "Price Range",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Center(
               child: RangeSlider(
-                  max: 20000,
-                  min: 1000,
-                  divisions: 10,
-                  labels: labels,
-                  values: values,
-                  onChanged: (newValues) {
-                    setState(() {
-                      values = newValues;
-                    });
-                  }),
+                max: 20000,
+                min: 1000,
+                divisions: 10,
+                labels: labels,
+                values: values,
+                onChanged: (newValues) {
+                  setState(() {
+                    values = newValues;
+                  });
+                },
+              ),
             ),
             Text(
               "Facilities",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             SizedBox(
               height: 40,
               width: MediaQuery.sizeOf(context).width,
@@ -325,14 +294,18 @@ class _FilterPannelState extends State<FilterPannel> {
             Text(
               "Locations",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            SizedBox(height: 20),
             DropdownMenu(
               inputDecorationTheme: InputDecorationTheme(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20))),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
               hintText: "select Location",
               width: MediaQuery.sizeOf(context).width - 40,
               enableSearch: true,
@@ -342,13 +315,12 @@ class _FilterPannelState extends State<FilterPannel> {
             Text(
               "Rating",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             SizedBox(
               height: 40,
               width: MediaQuery.sizeOf(context).width,
@@ -364,13 +336,14 @@ class _FilterPannelState extends State<FilterPannel> {
                     surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
                     shape: StadiumBorder(),
                     elevation: 20,
-                    //shadowColor: myColor,
                     backgroundColor: Color.fromARGB(255, 251, 253, 255),
                   ),
                   child: const Text(
                     "Reset",
                     style: TextStyle(
-                        color: Color.fromARGB(255, 0, 123, 255), fontSize: 20),
+                      color: Color.fromARGB(255, 0, 123, 255),
+                      fontSize: 20,
+                    ),
                   ),
                 ),
                 ElevatedButton(
@@ -379,18 +352,18 @@ class _FilterPannelState extends State<FilterPannel> {
                     surfaceTintColor: Color.fromARGB(255, 0, 123, 255),
                     shape: StadiumBorder(),
                     elevation: 20,
-                    //shadowColor: myColor,
                     backgroundColor: Color.fromARGB(255, 0, 149, 255),
                   ),
                   child: const Text(
                     "Apply",
                     style: TextStyle(
-                        color: Color.fromARGB(255, 243, 243, 243),
-                        fontSize: 20),
+                      color: Color.fromARGB(255, 243, 243, 243),
+                      fontSize: 20,
+                    ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -403,7 +376,6 @@ class SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 5),
-      //padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.0),
@@ -415,24 +387,53 @@ class SearchBar extends StatelessWidget {
           ),
         ],
       ),
-      child: TextField(
-        decoration: InputDecoration(
-            hintText: 'Search...',
-            border: InputBorder.none,
-            icon: Icon(Icons.search),
-            suffix: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: InkWell(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                child: Text("Search By Name or Address"),
+              )),
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: InkWell(
                   onTap: () {
                     showModalBottomSheet(
-                        isScrollControlled: false,
-                        context: context,
-                        builder: (Buildercontext) {
-                          return FilterPannel();
-                        });
+                      isScrollControlled: false,
+                      context: context,
+                      builder: (Buildercontext) {
+                        return FilterPannel();
+                      },
+                    );
                   },
-                  child: Icon(Icons.format_list_bulleted_sharp)),
-            )),
+                  child: Icon(Icons.format_list_bulleted_sharp),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

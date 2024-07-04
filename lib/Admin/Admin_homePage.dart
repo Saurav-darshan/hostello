@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Colors/Colors.dart';
 
@@ -7,11 +8,26 @@ class Admin_HomeScreen extends StatefulWidget {
   const Admin_HomeScreen({super.key});
 
   @override
-  State<Admin_HomeScreen> createState() => _HomeScreenState();
+  State<Admin_HomeScreen> createState() => _Admin_HomeScreenState();
 }
 
-class _HomeScreenState extends State<Admin_HomeScreen> {
+class _Admin_HomeScreenState extends State<Admin_HomeScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = _auth.currentUser;
+  }
+
+  Stream<DocumentSnapshot> getUserData() {
+    if (_currentUser != null) {
+      return _firestore.collection('users').doc(_currentUser!.uid).snapshots();
+    }
+    return Stream.empty();
+  }
 
   Stream<int> getTotalHostels() {
     return _firestore
@@ -51,48 +67,66 @@ class _HomeScreenState extends State<Admin_HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            backgroundColor: Ccolor.p1,
-            appBar: AppBar(
-              scrolledUnderElevation: 0,
-              backgroundColor: Ccolor.p1,
-              leading: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: InkWell(
-                  onTap: () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => ProfileScreen(),
-                    //     ));
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    foregroundImage: AssetImage("assets/pp.jpg"),
-                  ),
-                ),
+      child: Scaffold(
+        backgroundColor: Ccolor.p1,
+        appBar: AppBar(
+          scrolledUnderElevation: 0,
+          backgroundColor: Ccolor.p1,
+          leading: Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: InkWell(
+              onTap: () {
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+              },
+              child: CircleAvatar(
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                foregroundImage: AssetImage("assets/pp.jpg"),
               ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: IconButton(
-                      onPressed: () {
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => NotificationScreen(),
-                        //     ));
-                      },
-                      icon: Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                      ),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Ccolor.p3))),
-                )
-              ],
-              title: Column(
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: IconButton(
+                onPressed: () {
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen()));
+                },
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.white,
+                ),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Ccolor.p3)),
+              ),
+            )
+          ],
+          title: StreamBuilder<DocumentSnapshot>(
+            stream: getUserData(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Good Morning 👋",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      "Loading...",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                );
+              }
+
+              var userDocument = snapshot.data!;
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -103,43 +137,45 @@ class _HomeScreenState extends State<Admin_HomeScreen> {
                         fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    "Saurav Darshan",
+                    userDocument['username'],
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.w800),
                   ),
                 ],
+              );
+            },
+          ),
+          centerTitle: false,
+        ),
+        body: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(15.0),
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+                children: <Widget>[
+                  _buildStreamCard('Total Hostels', getTotalHostels(),
+                      Icons.hotel, Colors.blue),
+                  _buildStreamCard('Total Enquiries', getTotalEnquiries(),
+                      Icons.book, Colors.green),
+                  _buildStreamCard('Today\'s Enquiries', getTodayEnquiries(),
+                      Icons.today, Colors.orange),
+                  _buildStreamCard('Rejected Enquiries', getRejectedEnquiries(),
+                      Icons.pending, Colors.red),
+                ],
               ),
-              centerTitle: false,
             ),
-            body: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(15.0),
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16.0,
-                    mainAxisSpacing: 16.0,
-                    children: <Widget>[
-                      _buildStreamCard('Total Hostels', getTotalHostels(),
-                          Icons.hotel, Colors.blue),
-                      _buildStreamCard('Total Enquiries', getTotalEnquiries(),
-                          Icons.book, Colors.green),
-                      _buildStreamCard('Today\'s Enquiries',
-                          getTodayEnquiries(), Icons.today, Colors.orange),
-                      _buildStreamCard('Rejected Enquiries',
-                          getRejectedEnquiries(), Icons.pending, Colors.red),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Carousel_templete()
-              ],
-            )));
+            SizedBox(height: 10),
+            Carousel_templete(),
+          ],
+        ),
+      ),
+    );
   }
 
   Card _buildStreamCard(
@@ -177,8 +213,6 @@ class _HomeScreenState extends State<Admin_HomeScreen> {
   }
 }
 
-//----------------------------Carousel templete---------------->>
-
 class Carousel_templete extends StatefulWidget {
   const Carousel_templete({super.key});
 
@@ -195,12 +229,12 @@ class _Carousel_templeteState extends State<Carousel_templete> {
     'https://gos3.ibcdn.com/img-1697631817.jpg',
     'https://animationvisarts.com/wp-content/uploads/2017/05/airbnb-banner.jpg',
   ];
+
   @override
   Widget build(BuildContext context) {
     return CarouselSlider(
       options: CarouselOptions(
         height: 100.0,
-        // enlargeCenterPage: true,
         autoPlay: true,
         aspectRatio: 4 / 3,
         autoPlayCurve: Curves.fastOutSlowIn,
@@ -214,9 +248,7 @@ class _Carousel_templeteState extends State<Carousel_templete> {
             return Container(
               width: MediaQuery.of(context).size.width,
               margin: EdgeInsets.symmetric(horizontal: 5.0),
-              decoration: BoxDecoration(
-                color: Colors.amber,
-              ),
+              decoration: BoxDecoration(color: Colors.amber),
               child: Image.network(
                 url,
                 fit: BoxFit.cover,

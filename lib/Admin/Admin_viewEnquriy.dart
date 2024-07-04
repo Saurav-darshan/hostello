@@ -10,14 +10,15 @@ class Admin_ViewEnquiriesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Ccolor.p1,
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
-          'Hostel Enquiries',
+          '🔔 Hostel Enquiries 🔔',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            //color: Colors.white,
           ),
         ),
-        backgroundColor: Ccolor.p4,
+        backgroundColor: Ccolor.p1,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('enquiries').snapshots(),
