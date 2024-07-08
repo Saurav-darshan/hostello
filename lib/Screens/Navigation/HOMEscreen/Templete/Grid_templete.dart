@@ -17,14 +17,17 @@ class _GridTemplateState extends State<GridTemplate> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('hostels').snapshots(),
+      stream: _firestore
+          .collection('hostels')
+          .where('isLive', isEqualTo: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text('No hostels found'));
+          return Center(child: Text('No live hostels found'));
         }
 
         var hostels = snapshot.data!.docs;

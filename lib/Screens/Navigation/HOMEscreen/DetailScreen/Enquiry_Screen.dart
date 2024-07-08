@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/LandingPage.dart';
+import 'package:intl/intl.dart';
 
 class BookingScreen extends StatefulWidget {
   final String hostelname;
@@ -23,7 +24,8 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  DateTime selected_date = DateTime.now();
+  String selected_date =
+      DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now());
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   String _mobileNo = '';
@@ -133,21 +135,6 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ],
                       ),
-                      // Column(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: [
-                      //     Text(
-                      //       "${widget.price} \n/mo",
-                      //       overflow: TextOverflow.fade,
-                      //       style: TextStyle(
-                      //         color: Colors.black,
-                      //         fontSize: 15,
-                      //         fontWeight: FontWeight.w800,
-                      //       ),
-                      //     ),
-
-                      //   ],
-                      //  )
                     ],
                   ),
                 ),
@@ -299,9 +286,9 @@ class _BookingScreenState extends State<BookingScreen> {
         'mobileNo': _mobileNo,
         'email': _email,
         'gender': _gender,
-        'hostelname': widget
-            .hostelname, // Use widget.hostelname to access the passed data
+        'hostelname': widget.hostelname,
         'timestamp': FieldValue.serverTimestamp(),
+        'status': 'pending', // Set default status to pending
       });
     } catch (e) {
       print('Error saving enquiry: $e');

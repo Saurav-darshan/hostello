@@ -17,7 +17,10 @@ class _FeaturedTemplateState extends State<FeaturedTemplate> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('hostels').snapshots(),
+      stream: _firestore
+          .collection('hostels')
+          .where('isFeatured', isEqualTo: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -25,7 +28,7 @@ class _FeaturedTemplateState extends State<FeaturedTemplate> {
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
-              child: Text('No hostels found',
+              child: Text('No featured hostels found',
                   style: TextStyle(color: Colors.black54)));
         }
 
