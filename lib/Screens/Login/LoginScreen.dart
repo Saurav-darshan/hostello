@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         key: formKey,
                         child: Column(children: [
                           Text(
-                            "Welcome Back !",
+                            "Welcome User !",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 22,
@@ -288,6 +288,32 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 //------firebase signin-----------------\\
+  // void Firebase_signin() async {
+  //   setState(() {
+  //     _isSigning = true;
+  //   });
+
+  //   String email = UsernameController.text;
+  //   String password = PasswordController.text;
+  //   User? user = await _auth.signinwithemailandpassword(email, password);
+
+  //   if (user != null) {
+  //     print("login");
+  //     if (isRemember == true) {
+  //       saveCredentials();
+  //     }
+  //     Navigator.push(
+  //         context, MaterialPageRoute(builder: (context) => LandingPage()));
+  //     ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
+  //   } else {
+  //     print(" error --------->>>>>>>");
+  //     UsernameController.clear();
+  //     PasswordController.clear();
+  //   }
+  //   setState(() {
+  //     _isSigning = false;
+  //   });
+  // }
   void Firebase_signin() async {
     setState(() {
       _isSigning = true;
@@ -298,22 +324,40 @@ class _LoginScreenState extends State<LoginScreen> {
     User? user = await _auth.signinwithemailandpassword(email, password);
 
     if (user != null) {
-      print("login");
-      if (isRemember == true) {
-        saveCredentials();
+      if (user.emailVerified) {
+        // Proceed with login if email is verified
+        if (isRemember == true) {
+          saveCredentials();
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LandingPage()),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
+      } else {
+        // Email not verified, handle accordingly (e.g., show a message)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please verify your email before logging in."),
+          ),
+        );
       }
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LandingPage()));
-      ScaffoldMessenger.of(context).showSnackBar(Welcome_Snack);
     } else {
-      print(" error --------->>>>>>>");
+      // Handle sign-in failure (invalid credentials, etc.)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Invalid credentials. Please try again."),
+        ),
+      );
       UsernameController.clear();
       PasswordController.clear();
     }
+
     setState(() {
       _isSigning = false;
     });
   }
+
 //---------------google auth signin function-----------------------------\\
 
   // _signInWithGoogle() async {
@@ -375,6 +419,7 @@ class otherloginOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.sizeOf(context).width,
+      height: 300,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -417,84 +462,17 @@ class otherloginOption extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Add your onPressed code here!
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    side: BorderSide(color: Colors.grey),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 50.0, vertical: 12.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/apple.png',
-                      height: 30.0,
-                    ),
-                    SizedBox(width: 12.0),
-                    Text(
-                      'Sign in with Apple',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Add your onPressed code here!
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    side: BorderSide(color: Colors.grey),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/facebook.png',
-                      height: 30.0,
-                    ),
-                    SizedBox(width: 12.0),
-                    Text(
-                      'Sign in with Facebook',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.black,
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                side: BorderSide(color: Colors.grey),
+              ),
+            ),
             onPressed: () {
               Navigator.pushReplacement(
                   context,
@@ -502,16 +480,6 @@ class otherloginOption extends StatelessWidget {
                     builder: (context) => SignupScreen(),
                   ));
             },
-            // style: ElevatedButton.styleFrom(
-            //   foregroundColor: Colors.white,
-            //   backgroundColor: Colors.blue,
-            //   // Text color
-            //   shape: RoundedRectangleBorder(
-            //     borderRadius: BorderRadius.circular(8.0),
-            //     side: BorderSide(color: Colors.grey),
-            //   ),
-            //   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
-            // ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -520,7 +488,6 @@ class otherloginOption extends StatelessWidget {
                 //   'assets/google.png',
                 //   height: 30.0,
                 // ),
-
                 Text(
                   "Don't have a account ? Signup",
                   style: TextStyle(
@@ -530,10 +497,11 @@ class otherloginOption extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
           ElevatedButton(
+            style: ButtonStyle(
+                minimumSize: MaterialStatePropertyAll(Size(80, 40)),
+                shape: MaterialStatePropertyAll(
+                    StadiumBorder(side: BorderSide(color: Colors.black)))),
             onPressed: () {
               Navigator.pushReplacement(
                   context,
@@ -541,25 +509,11 @@ class otherloginOption extends StatelessWidget {
                     builder: (context) => Admin_SplashScreen(),
                   ));
             },
-            // style: ElevatedButton.styleFrom(
-            //   foregroundColor: Colors.white,
-            //   backgroundColor: Colors.blue,
-            //   // Text color
-            //   shape: RoundedRectangleBorder(
-            //     borderRadius: BorderRadius.circular(8.0),
-            //     side: BorderSide(color: Colors.grey),
-            //   ),
-            //   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
-            // ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Image.asset(
-                //   'assets/google.png',
-                //   height: 30.0,
-                // ),
-
+                Icon(Icons.admin_panel_settings),
                 Text(
                   "Admin Login",
                   style: TextStyle(
@@ -593,7 +547,6 @@ class otherloginOption extends StatelessWidget {
         );
 
         await _firebaseAuth.signInWithCredential(credential);
-        // Navigator.pushNamed(context, "/home");
       }
     } catch (e) {
       Fluttertoast.showToast(msg: '"some error occured $e"');

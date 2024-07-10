@@ -286,26 +286,51 @@ class _SignupScreenState extends State<SignupScreen> {
     String mobile = _mobileNoController.text;
     String gender = _gender;
     String role = _role;
-    User? user = await _auth.signupwithemailandpassword(email, password);
+    try {
+      User? user = await _auth.signupwithemailandpassword(email, password);
 
-    if (user != null) {
-      _createData(UserModel(
-        username: username,
-        email: email,
-        mobile: mobile,
-        gender: gender,
-        role: role,
-      ));
-      print("user created");
-      ScaffoldMessenger.of(context).showSnackBar(Signup_snack);
+      if (user != null) {
+        await user.sendEmailVerification();
+        _createData(UserModel(
+          username: username,
+          email: email,
+          mobile: mobile,
+          gender: gender,
+          role: role,
+        ));
+        print("user created");
 
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
-      setState(() {
-        _isSigningUP = false;
-      });
-    } else {
-      print(" error --------->>>>>>>");
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Verify your email'),
+              content: Text(
+                  'A verification link has been sent to your email. Please verify your email and then login.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+
+        setState(() {
+          _isSigningUP = false;
+        });
+      }
+    } catch (e) {
+      print(" error --------->>>>>>> $e");
       setState(() {
         _isSigningUP = false;
       });
@@ -315,8 +340,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  //------------------------------------------------------------------------\\
-  //---------->>>>> .  add data to firebase  <<<----------------------\\
   void _createData(UserModel userModel) {
     final userCollection = FirebaseFirestore.instance.collection("users");
 
@@ -334,27 +357,24 @@ class _SignupScreenState extends State<SignupScreen> {
     userCollection.doc(uid).set(newUser);
   }
 
-  //---------->>>>> .  update data of firebase  <<<----------------------\\
   void _updateData(UserModel userModel) {
     final userCollection = FirebaseFirestore.instance.collection("users");
     final newUser = UserModel(
-            username: userModel.username,
-            email: userModel.email,
-            mobile: userModel.mobile,
-            gender: userModel.gender,
-            role: userModel.role,
-            id: userModel.id)
-        .toJson();
+      username: userModel.username,
+      email: userModel.email,
+      mobile: userModel.mobile,
+      gender: userModel.gender,
+      role: userModel.role,
+      id: userModel.id,
+    ).toJson();
 
     userCollection.doc(userModel.id).update(newUser);
   }
-  //---------->>>>> .  read data of firebase  <<<----------------------\\
 
   void _submitForm() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      // Process signup with the entered data
       firebase_signup();
 
       print('Name: ${_nameController.text}');
@@ -367,32 +387,36 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   final Signup_snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.green[700],
-          ),
-          height: 30,
-          child: Text(
-            "Sign Up Successful!",
-            style: TextStyle(),
-          )));
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    content: Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.green[700],
+      ),
+      height: 30,
+      child: Text(
+        "Sign Up Successful!",
+        style: TextStyle(),
+      ),
+    ),
+  );
 
   final erroe_snack = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.red,
-          ),
-          height: 30,
-          child: Text(
-            "Email Already used",
-            style: TextStyle(),
-          )));
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    content: Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+      ),
+      height: 30,
+      child: Text(
+        "Email Already used",
+        style: TextStyle(),
+      ),
+    ),
+  );
 }
