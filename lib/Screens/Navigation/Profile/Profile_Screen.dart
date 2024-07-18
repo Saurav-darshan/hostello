@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hostello/Screens/LandingPage.dart';
 import 'package:hostello/Screens/Login/LoginScreen.dart';
@@ -15,11 +17,12 @@ class Profile_Screen extends StatefulWidget {
 
 class _Profile_ScreenState extends State<Profile_Screen> {
   String user = "User";
-  String image_uri = "";
+  String imageUri = "";
+
   @override
   void initState() {
-    Username();
     super.initState();
+    fetchUserData();
   }
 
   @override
@@ -45,8 +48,7 @@ class _Profile_ScreenState extends State<Profile_Screen> {
               Align(
                   alignment: Alignment(0, -.7),
                   child: CircleAvatar(
-                    foregroundImage: NetworkImage(
-                        "https://imindsbucket.s3.ap-south-1.amazonaws.com/${image_uri}"),
+                    foregroundImage: NetworkImage(imageUri),
                     radius: MediaQuery.sizeOf(context).width / 7,
                   )),
               Align(
@@ -329,16 +331,21 @@ class _Profile_ScreenState extends State<Profile_Screen> {
     );
   }
 
-  Future Username() async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    // var name = sp.getString('person_name');
-    // var uri = sp.getString('image_uri');
-    var name = "sa";
-    var uri = "assets/pp.jpg";
+  Future<void> fetchUserData() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
 
-    setState(() {
-      user = name!;
-      image_uri = uri!;
-    });
+      if (userDoc.exists) {
+        var userData = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          user = userData['username'] ?? "User";
+          imageUri = userData['imageUri'] ?? "";
+        });
+      }
+    }
   }
 }
